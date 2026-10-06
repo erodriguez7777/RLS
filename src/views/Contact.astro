@@ -1,0 +1,139 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import EstimateForm from '../components/EstimateForm.astro';
+import Icon from '../components/Icon.astro';
+import AreasList from '../components/AreasList.astro';
+import Testimonials from '../components/Testimonials.astro';
+import { reviews } from '../data/reviews';
+import { site, telHref, smsHref, mailHref } from '../data/site';
+import { r, type Lang } from '../i18n/routes';
+import { useT } from '../i18n/ui';
+import heroImg from '../assets/photos/lush-lawn.jpg';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+const other: Lang = lang === 'en' ? 'es' : 'en';
+const title = lang === 'en' ? 'Free Landscaping Estimate | Contact Rodriguez Landscaping' : 'Estimado Gratis de Jardinería | Contacte a Rodriguez Landscaping';
+const description =
+  lang === 'en'
+    ? `Request a free, no-obligation landscaping estimate in the Inland Empire. Call or text ${site.phone}. Licensed & insured, CA #${site.license}.`
+    : `Pida un estimado de jardinería gratis y sin compromiso en el Inland Empire. Llame o envíe un texto al ${site.phone}. Con licencia y seguro, CA #${site.license}.`;
+const quote = reviews[0];
+---
+
+<Base lang={lang} title={title} description={description} alternate={r('contact', other)}>
+  <PageHero
+    image={heroImg}
+    eyebrow={t('trust.free')}
+    title={lang === 'en' ? 'Get Your Free Landscaping Estimate' : 'Pida Su Estimado de Jardinería Gratis'}
+    text={lang === 'en' ? 'Fill out the form, call, or text — whatever is easiest for you. We usually reply the same day.' : 'Llene el formulario, llame o envíe un texto — lo que le sea más fácil. Normalmente respondemos el mismo día.'}
+    crumbs={[{ href: r('home', lang), label: t('breadcrumb.home') }, { label: t('nav.contact') }]}
+  />
+
+  <section class="section">
+    <div class="container contact">
+      <EstimateForm lang={lang} title={t('form.title')} />
+
+      <aside class="contact__aside">
+        <div class="card contact__card">
+          <h2>{lang === 'en' ? 'Prefer to call or text?' : '¿Prefiere llamar o enviar un texto?'}</h2>
+          <a class="contact__big" href={telHref} data-track="call-contact"><Icon name="phone" /> {site.phone}</a>
+          <div class="btn-row">
+            <a class="btn btn--green" href={telHref} data-track="call-contact-btn"><Icon name="phone" /> {t('cta.callNow')}</a>
+            <a class="btn btn--ghost" href={smsHref} data-track="text-contact"><Icon name="message" /> {t('cta.textUs')}</a>
+          </div>
+          <ul class="contact__list">
+            <li><Icon name="mail" size={20} /> <a href={mailHref}>{site.email}</a></li>
+            {site.hours && <li><Icon name="clock" size={20} /> {site.hours[lang]}</li>}
+            <li><Icon name="shield" size={20} /> {t('trust.licensed')} · {t('trust.license')}</li>
+            {site.spanishSpoken && <li><Icon name="globe" size={20} /> {t('trust.spanish')}</li>}
+          </ul>
+        </div>
+
+        <div class="card contact__card">
+          <h2>{lang === 'en' ? 'What happens next?' : '¿Qué sigue?'}</h2>
+          <ol class="contact__steps">
+            <li>{lang === 'en' ? 'We call or text you back — usually the same day.' : 'Le llamamos o enviamos un texto — normalmente el mismo día.'}</li>
+            <li>{lang === 'en' ? 'We schedule a free visit to see your yard.' : 'Agendamos una visita gratis para ver su jardín.'}</li>
+            <li>{lang === 'en' ? 'You get clear options and honest pricing — no pressure.' : 'Recibe opciones claras y precios honestos — sin presión.'}</li>
+          </ol>
+        </div>
+
+        <Testimonials lang={lang} items={[quote]} />
+      </aside>
+    </div>
+  </section>
+
+  <section class="section section--sand section--tight">
+    <div class="container">
+      <div class="section-head">
+        <h2>{t('section.areas.title')}</h2>
+        <p>{t('section.areas.text')}</p>
+      </div>
+      <AreasList lang={lang} />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .contact {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: clamp(28px, 4vw, 48px);
+    align-items: start;
+  }
+  .contact__aside {
+    display: grid;
+    gap: 20px;
+  }
+  .contact__card {
+    padding: 28px;
+  }
+  .contact__card h2 {
+    font-size: 1.4rem;
+  }
+  .contact__big {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 3vw, 2.2rem);
+    font-weight: 700;
+    color: var(--green-800);
+    text-decoration: none;
+    margin-bottom: 16px;
+  }
+  .contact__list {
+    list-style: none;
+    padding: 0;
+    margin: 22px 0 0;
+    display: grid;
+    gap: 12px;
+  }
+  .contact__list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    word-break: break-word;
+  }
+  .contact__list :global(svg) {
+    color: var(--green-600);
+    flex: none;
+  }
+  .contact__steps {
+    margin: 0;
+    padding-left: 22px;
+    display: grid;
+    gap: 10px;
+    color: var(--ink-soft);
+  }
+  @media (max-width: 960px) {
+    .contact {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

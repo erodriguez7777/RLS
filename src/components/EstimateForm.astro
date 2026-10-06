@@ -1,0 +1,208 @@
+---
+import Icon from './Icon.astro';
+import { site, telHref } from '../data/site';
+import { services } from '../data/services';
+import { cities } from '../data/cities';
+import { r, type Lang } from '../i18n/routes';
+import { useT } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  id?: string;
+  title?: string;
+  subtitle?: string;
+  defaultCity?: string;
+  defaultService?: string;
+  compact?: boolean;
+}
+const { lang, id = 'estimate', title, subtitle, defaultCity, defaultService, compact = false } = Astro.props;
+const t = useT(lang);
+const f = (name: string) => `${id}-${name}`;
+// "Highland & East Highlands Ranch" reads better in a dropdown as two entries.
+const cityOptions = cities
+  .flatMap((c) => (c.slug === 'highland' ? ['Highland', 'East Highlands Ranch'] : [c.name]))
+  .sort((a, b) => a.localeCompare(b));
+---
+
+<div class:list={['eform', { 'eform--compact': compact }]} id={id}>
+  <div class="eform__head">
+    <h2 class="eform__title">{title ?? t('form.title')}</h2>
+    <p class="eform__sub">{subtitle ?? t('form.subtitle')}</p>
+  </div>
+
+  <form
+    name="estimate"
+    method="POST"
+    action={r('thanks', lang)}
+    data-netlify="true"
+    netlify-honeypot="bot-field"
+    data-estimate-form
+  >
+    <input type="hidden" name="form-name" value="estimate" />
+    <input type="hidden" name="language" value={lang} />
+    <input type="hidden" name="source-page" value={Astro.url.pathname} />
+    <p class="visually-hidden" aria-hidden="true">
+      <label>Leave empty <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+    </p>
+
+    <div class="eform__grid">
+      <div class="field">
+        <label for={f('name')}>{t('form.name')} <span class="req" aria-hidden="true">*</span></label>
+        <input id={f('name')} name="name" type="text" autocomplete="name" required />
+      </div>
+      <div class="field">
+        <label for={f('phone')}>{t('form.phone')} <span class="req" aria-hidden="true">*</span></label>
+        <input id={f('phone')} name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(909) 555-1234" pattern="[\d\s()+.\-]{10,}" required />
+      </div>
+      <div class="field">
+        <label for={f('city')}>{t('form.city')} <span class="req" aria-hidden="true">*</span></label>
+        <select id={f('city')} name="city" required>
+          <option value="" disabled selected={!defaultCity}>{t('form.cityPlaceholder')}</option>
+          {cityOptions.map((c) => <option value={c} selected={defaultCity === c}>{c}</option>)}
+          <option value="Other">{t('form.cityOther')}</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for={f('service')}>{t('form.service')} <span class="req" aria-hidden="true">*</span></label>
+        <select id={f('service')} name="service" required>
+          <option value="" disabled selected={!defaultService}>{t('form.servicePlaceholder')}</option>
+          {services.map((s) => <option value={s.title.en} selected={defaultService === s.id}>{s.title[lang]}</option>)}
+          <option value="Not sure">{t('form.serviceNotSure')}</option>
+        </select>
+      </div>
+      {
+        !compact && (
+          <div class="field field--full">
+            <label for={f('email')}>{t('form.email')}</label>
+            <input id={f('email')} name="email" type="email" autocomplete="email" />
+          </div>
+        )
+      }
+      <div class="field field--full">
+        <label for={f('message')}>{t('form.message')}</label>
+        <textarea id={f('message')} name="message" rows={compact ? 2 : 4} placeholder={t('form.messagePlaceholder')}></textarea>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn--primary btn--block btn--lg" data-sending={t('form.sending')}>
+      {t('form.submit')}
+      <Icon name="arrow" />
+    </button>
+    <p class="eform__privacy"><Icon name="shield" size={16} /> {t('form.privacy')}</p>
+    <p class="eform__alt">
+      {t('form.prefer')} <a href={telHref} data-track="call-form">{site.phone}</a>
+    </p>
+  </form>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>('[data-estimate-form]').forEach((form) => {
+    form.addEventListener('submit', () => {
+      const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+      if (btn && btn.dataset.sending) {
+        btn.disabled = true;
+        btn.textContent = btn.dataset.sending;
+      }
+    });
+  });
+</script>
+
+<style>
+  .eform {
+    background: var(--white);
+    border-radius: 20px;
+    padding: clamp(22px, 3vw, 34px);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--line);
+    color: var(--ink);
+  }
+  .eform__title {
+    font-size: clamp(1.5rem, 2.4vw, 1.85rem);
+    margin-bottom: 6px;
+  }
+  .eform__sub {
+    color: var(--ink-soft);
+    font-size: 0.98rem;
+    margin-bottom: 20px;
+  }
+  .eform__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+  .field--full {
+    grid-column: 1 / -1;
+  }
+  .field label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--green-900);
+  }
+  .req {
+    color: #b3261e;
+  }
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    font: inherit;
+    font-size: 1rem;
+    color: var(--ink);
+    background: var(--sand-50);
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+    min-height: 50px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s;
+  }
+  .field textarea {
+    resize: vertical;
+    min-height: 0;
+  }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    outline: none;
+    border-color: var(--green-600);
+    background: var(--white);
+    box-shadow: 0 0 0 4px rgba(95, 165, 58, 0.18);
+  }
+  .field input:user-invalid,
+  .field select:user-invalid {
+    border-color: #b3261e;
+  }
+  .eform__privacy {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    margin: 12px 0 4px;
+    text-align: center;
+  }
+  .eform__privacy :global(svg) {
+    color: var(--green-600);
+    flex: none;
+  }
+  .eform__alt {
+    text-align: center;
+    font-size: 0.92rem;
+    margin: 0;
+  }
+  .eform__alt a {
+    font-weight: 700;
+  }
+  @media (max-width: 520px) {
+    .eform__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

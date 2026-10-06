@@ -1,0 +1,166 @@
+---
+import '../styles/global.css';
+import { getImage } from 'astro:assets';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import MobileCallBar from '../components/MobileCallBar.astro';
+import { site } from '../data/site';
+import { cities } from '../data/cities';
+import { services } from '../data/services';
+import type { Lang } from '../i18n/routes';
+import { useT } from '../i18n/ui';
+import ogDefault from '../assets/photos/hero-front-yard.jpg';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  alternate: string; // same page in the other language
+  schema?: Record<string, unknown>[];
+  noindex?: boolean;
+}
+const { lang, title, description, alternate, schema = [], noindex = false } = Astro.props;
+const t = useT(lang);
+
+const canonical = new URL(Astro.url.pathname, site.url).href;
+const altUrl = new URL(alternate, site.url).href;
+const enUrl = lang === 'en' ? canonical : altUrl;
+const esUrl = lang === 'es' ? canonical : altUrl;
+const og = await getImage({ src: ogDefault, width: 1200, height: 630, format: 'jpg', fit: 'cover' });
+const ogUrl = new URL(og.src, site.url).href;
+
+const business = {
+  '@context': 'https://schema.org',
+  '@type': 'LandscapingBusiness',
+  '@id': `${site.url}/#business`,
+  name: site.name,
+  url: site.url,
+  telephone: site.phoneE164,
+  email: site.email,
+  image: ogUrl,
+  logo: new URL('/favicon.svg', site.url).href,
+  priceRange: '$$',
+  description:
+    lang === 'en'
+      ? `Licensed, bonded and insured landscaping company serving the Inland Empire for ${site.years}+ years. CA License #${site.license}.`
+      : `Empresa de jardinería con licencia, fianza y seguro sirviendo al Inland Empire por más de ${site.years} años. Licencia CA #${site.license}.`,
+  address: { '@type': 'PostalAddress', addressRegion: 'CA', addressCountry: 'US' },
+  areaServed: cities.flatMap((c) =>
+    (c.slug === 'highland' ? ['Highland', 'East Highlands Ranch'] : [c.name]).map((name) => ({
+      '@type': 'City',
+      name: `${name}, CA`,
+    })),
+  ),
+  knowsLanguage: site.spanishSpoken ? ['en', 'es'] : ['en'],
+  hasCredential: {
+    '@type': 'EducationalOccupationalCredential',
+    credentialCategory: 'California State Contractors License',
+    identifier: site.license,
+    recognizedBy: { '@type': 'GovernmentOrganization', name: 'Contractors State License Board (CSLB)' },
+  },
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: lang === 'en' ? 'Landscaping Services' : 'Servicios de Jardinería',
+    itemListElement: services.map((s) => ({
+      '@type': 'Offer',
+      itemOffered: { '@type': 'Service', name: s.title[lang] },
+    })),
+  },
+  sameAs: Object.values(site.social).filter(Boolean),
+  ...(site.googleRating
+    ? {
+        aggregateRating: {
+          '@type': 'AggregateRating',
+          ratingValue: site.googleRating.rating,
+          reviewCount: site.googleRating.count,
+        },
+      }
+    : {}),
+};
+const jsonLd = [business, ...schema];
+---
+
+<!doctype html>
+<html lang={lang === 'en' ? 'en-US' : 'es-US'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {
+      noindex ? (
+        <meta name="robots" content="noindex" />
+      ) : (
+        <>
+          <link rel="alternate" hreflang="en-US" href={enUrl} />
+          <link rel="alternate" hreflang="es-US" href={esUrl} />
+          <link rel="alternate" hreflang="x-default" href={enUrl} />
+        </>
+      )
+    }
+    <meta name="theme-color" content="#1f4d2b" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:locale" content={lang === 'en' ? 'en_US' : 'es_US'} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    {
+      site.ga4Id && (
+        <>
+          <script async src={`https://www.googletagmanager.com/gtag/js?id=${site.ga4Id}`} />
+          <script is:inline define:vars={{ id: site.ga4Id }}>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+              dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+            gtag('config', id);
+          </script>
+        </>
+      )
+    }
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t('nav.skip')}</a>
+    <Header lang={lang} alternate={alternate} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+    <MobileCallBar lang={lang} />
+
+    <script>
+      // Fade sections in as they scroll into view.
+      const io = new IntersectionObserver(
+        (entries) =>
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add('is-visible');
+              io.unobserve(e.target);
+            }
+          }),
+        { rootMargin: '0px 0px -8% 0px' },
+      );
+      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+      // Report call/text clicks to GA4 when it's enabled.
+      document.addEventListener('click', (e) => {
+        const a = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[data-track]');
+        const gtag = (window as any).gtag;
+        if (a && typeof gtag === 'function') {
+          gtag('event', a.href.startsWith('sms:') ? 'text_click' : 'call_click', { location: a.dataset.track });
+        }
+      });
+    </script>
+  </body>
+</html>

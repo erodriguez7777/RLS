@@ -1,0 +1,69 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { site, telHref } from '../data/site';
+import { r, type Lang } from '../i18n/routes';
+import { useT } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+const other: Lang = lang === 'en' ? 'es' : 'en';
+---
+
+<Base
+  lang={lang}
+  title={lang === 'en' ? 'Thank You! | Rodriguez Landscaping' : '¡Gracias! | Rodriguez Landscaping'}
+  description={lang === 'en' ? 'Your estimate request was received.' : 'Recibimos su solicitud de estimado.'}
+  alternate={r('thanks', other)}
+  noindex
+>
+  <section class="section thanks">
+    <div class="container thanks__inner">
+      <span class="thanks__icon"><Icon name="check" size={40} /></span>
+      <h1>{lang === 'en' ? 'Thank you! We got your request.' : '¡Gracias! Recibimos su solicitud.'}</h1>
+      <p>
+        {
+          lang === 'en'
+            ? 'A member of our team will call or text you shortly — usually the same day — to schedule your free estimate.'
+            : 'Alguien de nuestro equipo le llamará o enviará un texto pronto — normalmente el mismo día — para agendar su estimado gratis.'
+        }
+      </p>
+      <p>{lang === 'en' ? 'Need us sooner? Call now:' : '¿Nos necesita antes? Llame ahora:'}</p>
+      <div class="btn-row">
+        <a class="btn btn--primary btn--lg" href={telHref} data-track="call-thanks"><Icon name="phone" /> {site.phone}</a>
+        <a class="btn btn--ghost btn--lg" href={r('gallery', lang)}>{t('cta.viewWork')}</a>
+      </div>
+    </div>
+  </section>
+  <script is:inline>
+    // Conversion event for GA4 / Google Ads when analytics is enabled.
+    if (typeof gtag === 'function') gtag('event', 'generate_lead', { form: 'estimate' });
+  </script>
+</Base>
+
+<style>
+  .thanks__inner {
+    max-width: 680px;
+    text-align: center;
+  }
+  .thanks__inner p {
+    color: var(--ink-soft);
+    font-size: 1.12rem;
+  }
+  .thanks__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    background: var(--green-100);
+    color: var(--green-600);
+    margin-bottom: 20px;
+  }
+  .thanks .btn-row {
+    justify-content: center;
+  }
+</style>

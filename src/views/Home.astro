@@ -1,0 +1,225 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import TrustBar from '../components/TrustBar.astro';
+import EstimateForm from '../components/EstimateForm.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import WhyUs from '../components/WhyUs.astro';
+import Process from '../components/Process.astro';
+import GalleryGrid from '../components/GalleryGrid.astro';
+import Testimonials from '../components/Testimonials.astro';
+import AreasList from '../components/AreasList.astro';
+import FAQ from '../components/FAQ.astro';
+import CTABand from '../components/CTABand.astro';
+import { site, telHref } from '../data/site';
+import { services } from '../data/services';
+import { faqs } from '../data/faqs';
+import { r, type Lang } from '../i18n/routes';
+import { useT } from '../i18n/ui';
+import hero from '../assets/photos/hero-front-yard.jpg';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+const other: Lang = lang === 'en' ? 'es' : 'en';
+
+const title =
+  lang === 'en'
+    ? 'Rodriguez Landscaping | Licensed Inland Empire Landscaper · Free Estimates'
+    : 'Rodriguez Landscaping | Jardinería con Licencia en el Inland Empire · Estimados Gratis';
+const description =
+  lang === 'en'
+    ? `Trusted Inland Empire landscaping for ${site.years}+ years. Lawn care, sod, sprinklers, drought-tolerant & hardscape. Licensed & insured (CA #${site.license}). Call ${site.phone} for a free estimate.`
+    : `Jardinería de confianza en el Inland Empire por más de ${site.years} años. Mantenimiento, pasto, riego, jardines de bajo consumo y hardscape. Con licencia y seguro (CA #${site.license}). Llame al ${site.phone}.`;
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q[lang],
+    acceptedAnswer: { '@type': 'Answer', text: f.a[lang] },
+  })),
+};
+---
+
+<Base lang={lang} title={title} description={description} alternate={r('home', other)} schema={[faqSchema]}>
+  <section class="hero">
+    <Image quality={68} src={hero} alt="" class="hero__bg" widths={[800, 1400, 2200]} sizes="100vw" loading="eager" fetchpriority="high" />
+    <div class="container hero__grid">
+      <div class="hero__copy">
+        <span class="hero__eyebrow"><Icon name="pin" size={16} /> {t('hero.eyebrow')}</span>
+        <h1>{t('hero.title')}</h1>
+        <p class="hero__sub">{t('hero.subtitle')}</p>
+        <ul class="checks checks--light hero__points">
+          <li>{t('hero.point1')}</li>
+          <li>{t('hero.point2')}</li>
+          <li>{t('hero.point3')}</li>
+        </ul>
+        <div class="btn-row">
+          <a class="btn btn--primary btn--lg hero__cta-mobile" href="#estimate">{t('cta.estimate')}</a>
+          <a class="btn btn--ghost-light btn--lg" href={telHref} data-track="call-hero"><Icon name="phone" /> {t('cta.callNow')}: {site.phone}</a>
+        </div>
+      </div>
+      <div class="hero__form">
+        <EstimateForm lang={lang} compact />
+      </div>
+    </div>
+  </section>
+
+  <TrustBar lang={lang} />
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">{t('section.services.eyebrow')}</span>
+        <h2>{t('section.services.title')}</h2>
+        <p>{t('section.services.text')}</p>
+      </div>
+      <div class="grid grid--4">
+        {services.map((s) => <ServiceCard service={s} lang={lang} />)}
+      </div>
+    </div>
+  </section>
+
+  <div class="section--sand"><WhyUs lang={lang} /></div>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">{t('section.reviews.eyebrow')}</span>
+        <h2>{t('section.reviews.title')}</h2>
+        <p>{t('section.reviews.text')}</p>
+      </div>
+      <Testimonials lang={lang} limit={3} />
+      <p class="center-link"><a class="btn btn--ghost" href={r('reviews', lang)}>{t('cta.allReviews')} <Icon name="arrow" size={18} /></a></p>
+    </div>
+  </section>
+
+  <Process lang={lang} />
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">{t('section.gallery.eyebrow')}</span>
+        <h2>{t('section.gallery.title')}</h2>
+        <p>{t('section.gallery.text')}</p>
+      </div>
+      <GalleryGrid lang={lang} limit={5} />
+      <p class="center-link"><a class="btn btn--ghost" href={r('gallery', lang)}>{t('cta.viewWork')} <Icon name="arrow" size={18} /></a></p>
+    </div>
+  </section>
+
+  <section class="section section--sand">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">{t('section.areas.eyebrow')}</span>
+        <h2>{t('section.areas.title')}</h2>
+        <p>{t('section.areas.text')}</p>
+      </div>
+      <AreasList lang={lang} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">{t('section.faq.eyebrow')}</span>
+        <h2>{t('section.faq.title')}</h2>
+      </div>
+      <FAQ lang={lang} items={faqs} />
+    </div>
+  </section>
+
+  <CTABand lang={lang} />
+</Base>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    background: var(--green-900);
+    color: var(--white);
+  }
+  .hero__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, rgba(14, 38, 21, 0.94) 0%, rgba(14, 38, 21, 0.82) 45%, rgba(14, 38, 21, 0.45) 100%);
+  }
+  .hero__grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: clamp(32px, 5vw, 64px);
+    align-items: center;
+    padding-block: clamp(48px, 7vw, 96px);
+  }
+  .hero__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 22px;
+  }
+  .hero__eyebrow :global(svg) {
+    color: #a6db86;
+  }
+  .hero h1 {
+    color: var(--white);
+    margin-bottom: 18px;
+  }
+  .hero__sub {
+    font-size: clamp(1.08rem, 1.5vw, 1.25rem);
+    color: #e1eadd;
+    max-width: 580px;
+  }
+  .hero__points {
+    margin: 24px 0 32px;
+    font-weight: 500;
+  }
+  .hero__form :global(.eform) {
+    max-width: 520px;
+    margin-left: auto;
+  }
+  .hero__cta-mobile {
+    display: none;
+  }
+  .center-link {
+    text-align: center;
+    margin: 40px 0 0;
+  }
+  @media (max-width: 980px) {
+    .hero__grid {
+      grid-template-columns: 1fr;
+    }
+    .hero__form :global(.eform) {
+      margin: 0 auto;
+    }
+    .hero__cta-mobile {
+      display: inline-flex;
+    }
+  }
+  @media (max-width: 520px) {
+    .hero .btn-row .btn {
+      width: 100%;
+      white-space: normal;
+    }
+  }
+</style>

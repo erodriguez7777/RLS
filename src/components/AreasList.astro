@@ -1,0 +1,60 @@
+---
+import Icon from './Icon.astro';
+import { cities } from '../data/cities';
+import { cityPath, type Lang } from '../i18n/routes';
+
+interface Props {
+  lang: Lang;
+  exclude?: string;
+  only?: string[];
+}
+const { lang, exclude, only } = Astro.props;
+const list = cities.filter((c) => c.slug !== exclude && (!only || only.includes(c.slug)));
+---
+
+<ul class="areas">
+  {
+    list.map((c) => (
+      <li>
+        <a href={cityPath(c.slug, lang)}>
+          <Icon name="pin" size={18} />
+          <span>{c.name}</span>
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .areas {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 165px), 1fr));
+    gap: 12px;
+  }
+  .areas a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 100%;
+    padding: 14px 16px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    font-weight: 600;
+    color: var(--green-900);
+    text-decoration: none;
+    transition: border-color 0.15s, background 0.15s, transform 0.15s;
+  }
+  .areas a:hover {
+    border-color: var(--green-500);
+    background: var(--green-100);
+    transform: translateY(-2px);
+  }
+  .areas :global(svg) {
+    color: var(--green-600);
+    flex: none;
+  }
+</style>

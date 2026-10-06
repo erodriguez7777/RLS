@@ -1,0 +1,321 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { site, telHref } from '../data/site';
+import { r, type Lang } from '../i18n/routes';
+import { useT } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  alternate: string;
+}
+const { lang, alternate } = Astro.props;
+const t = useT(lang);
+const current = Astro.url.pathname.replace(/\/?$/, '/');
+
+const nav = [
+  { href: r('services', lang), label: t('nav.services') },
+  { href: r('areas', lang), label: t('nav.areas') },
+  { href: r('gallery', lang), label: t('nav.gallery') },
+  { href: r('reviews', lang), label: t('nav.reviews') },
+  { href: r('about', lang), label: t('nav.about') },
+];
+const isActive = (href: string) => current.startsWith(href);
+---
+
+<div class="topbar">
+  <div class="container topbar__inner">
+    <span class="topbar__item"><Icon name="shield" size={16} /> {t('trust.licensed')} · {t('trust.license')}</span>
+    <span class="topbar__item topbar__hide-sm"><Icon name="award" size={16} /> {t('trust.years')}</span>
+    {site.spanishSpoken && <span class="topbar__item topbar__hide-sm"><Icon name="globe" size={16} /> {t('trust.spanish')}</span>}
+  </div>
+</div>
+
+<header class="header" data-header>
+  <div class="container header__inner">
+    <a href={r('home', lang)} class="header__logo">
+      <Logo />
+    </a>
+
+    <nav class="nav" aria-label="Main">
+      <ul>
+        {
+          nav.map((item) => (
+            <li>
+              <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="header__actions">
+      <a class="lang" href={alternate} hreflang={lang === 'en' ? 'es' : 'en'} lang={lang === 'en' ? 'es' : 'en'} aria-label={t('lang.switchLabel')}>
+        <Icon name="globe" size={18} />
+        <span>{lang === 'en' ? 'ES' : 'EN'}</span>
+      </a>
+      <a class="header__phone" href={telHref} data-track="call-header" aria-label={`${t('cta.call')} ${site.phone}`}>
+        <span class="header__phone-icon"><Icon name="phone" size={18} /></span>
+        <span class="header__phone-text">
+          <small>{lang === 'en' ? 'Call for a free quote' : 'Llame para un estimado'}</small>
+          <strong>{site.phone}</strong>
+        </span>
+      </a>
+      <a class="btn btn--primary header__cta" href={r('contact', lang)}>{t('cta.estimateShort')}</a>
+      <button class="burger" type="button" aria-expanded="false" aria-controls="mobile-nav" data-burger>
+        <Icon name="menu" />
+        <span class="visually-hidden">{t('nav.menu')}</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="mnav" id="mobile-nav" hidden data-mnav>
+    <nav class="container" aria-label="Mobile">
+      <ul>
+        <li><a href={r('home', lang)}>{t('breadcrumb.home')}</a></li>
+        {nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+        <li><a href={r('contact', lang)}>{t('nav.contact')}</a></li>
+      </ul>
+      <div class="mnav__cta">
+        <a class="btn btn--primary btn--block" href={r('contact', lang)}>{t('cta.estimate')}</a>
+        <a class="btn btn--ghost btn--block" href={telHref}><Icon name="phone" /> {site.phone}</a>
+        <a class="mnav__lang" href={alternate} hreflang={lang === 'en' ? 'es' : 'en'}><Icon name="globe" size={18} /> {t('lang.switch')}</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const burger = document.querySelector<HTMLButtonElement>('[data-burger]');
+  const menu = document.querySelector<HTMLElement>('[data-mnav]');
+  burger?.addEventListener('click', () => {
+    const open = burger.getAttribute('aria-expanded') === 'true';
+    burger.setAttribute('aria-expanded', String(!open));
+    if (menu) menu.hidden = open;
+    document.body.classList.toggle('nav-open', !open);
+  });
+  const header = document.querySelector('[data-header]');
+  const onScroll = () => header?.classList.toggle('is-scrolled', window.scrollY > 8);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+</script>
+
+<style>
+  .topbar {
+    background: var(--green-900);
+    color: #d5e2d1;
+    font-size: 0.8125rem;
+  }
+  .topbar__inner {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    align-items: center;
+    min-height: 36px;
+    flex-wrap: wrap;
+  }
+  .topbar__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .topbar__item :global(svg) {
+    color: #a6db86;
+  }
+  @media (max-width: 640px) {
+    .topbar__hide-sm {
+      display: none;
+    }
+  }
+
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(251, 248, 242, 0.96);
+    backdrop-filter: saturate(1.4) blur(10px);
+    border-bottom: 1px solid transparent;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .header:global(.is-scrolled) {
+    border-color: var(--line);
+    box-shadow: 0 6px 24px -14px rgba(18, 48, 27, 0.35);
+  }
+  .header__inner {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    min-height: var(--header-h);
+  }
+  .header__logo {
+    text-decoration: none;
+    flex: none;
+  }
+
+  .nav {
+    margin-left: auto;
+  }
+  .nav ul {
+    display: flex;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .nav a {
+    display: block;
+    padding: 10px 11px;
+    white-space: nowrap;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .nav a:hover,
+  .nav a[aria-current='page'] {
+    color: var(--green-700);
+    background: var(--green-100);
+  }
+
+  .header__actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .lang {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: var(--green-700);
+    text-decoration: none;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+  }
+  .lang:hover {
+    background: var(--green-100);
+  }
+  .header__phone {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--green-900);
+  }
+  .header__phone-icon {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--green-700);
+    color: var(--white);
+  }
+  .header__phone-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+  .header__phone-text small {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+  }
+  .header__phone-text strong {
+    font-size: 1.05rem;
+  }
+  .header__cta {
+    min-height: 46px;
+    padding: 10px 20px;
+  }
+
+  .burger {
+    display: none;
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    width: 46px;
+    height: 46px;
+    place-items: center;
+    color: var(--green-900);
+    cursor: pointer;
+  }
+
+  .mnav {
+    border-top: 1px solid var(--line);
+    background: var(--sand-50);
+    max-height: calc(100vh - var(--header-h));
+    overflow-y: auto;
+  }
+  .mnav ul {
+    list-style: none;
+    margin: 0;
+    padding: 8px 0;
+  }
+  .mnav li a {
+    display: block;
+    padding: 14px 4px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--line);
+  }
+  .mnav__cta {
+    display: grid;
+    gap: 12px;
+    padding: 16px 0 24px;
+  }
+  .mnav__lang {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    padding: 8px;
+  }
+
+  .header__phone-text strong {
+    white-space: nowrap;
+  }
+  @media (max-width: 1320px) {
+    .header__phone-text small {
+      display: none;
+    }
+  }
+  @media (max-width: 1240px) {
+    .header__phone-text {
+      display: none;
+    }
+  }
+  @media (max-width: 1080px) {
+    .nav {
+      display: none;
+    }
+    .header__actions {
+      margin-left: auto;
+    }
+    .burger {
+      display: grid;
+    }
+  }
+  @media (max-width: 640px) {
+    .header__cta,
+    .header__phone-text,
+    .lang span {
+      display: none;
+    }
+    .header__actions {
+      gap: 8px;
+    }
+    .lang {
+      width: 46px;
+      height: 46px;
+      justify-content: center;
+    }
+  }
+</style>

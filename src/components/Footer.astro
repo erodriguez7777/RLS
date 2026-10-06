@@ -1,0 +1,198 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { site, telHref, smsHref, mailHref } from '../data/site';
+import { services } from '../data/services';
+import { cities } from '../data/cities';
+import { r, servicePath, cityPath, type Lang } from '../i18n/routes';
+import { useT } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+const year = new Date().getFullYear();
+const socials = Object.entries(site.social).filter(([, url]) => url);
+---
+
+<footer class="footer">
+  <div class="container footer__grid">
+    <div class="footer__brand">
+      <Logo light />
+      <p>{t('footer.tagline')}</p>
+      <ul class="footer__badges">
+        <li><Icon name="shield" size={18} /> {t('trust.licensed')}</li>
+        <li><Icon name="award" size={18} /> {t('trust.license')} · <a href={site.cslbUrl} target="_blank" rel="noopener">{t('footer.verify')}</a></li>
+        <li><Icon name="clock" size={18} /> {t('trust.years')}</li>
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="footer__h">{t('footer.services')}</h2>
+      <ul class="footer__links">
+        {services.map((s) => <li><a href={servicePath(s.slug, lang)}>{s.title[lang]}</a></li>)}
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="footer__h">{t('footer.company')}</h2>
+      <ul class="footer__links">
+        <li><a href={r('about', lang)}>{t('nav.about')}</a></li>
+        <li><a href={r('gallery', lang)}>{t('nav.gallery')}</a></li>
+        <li><a href={r('reviews', lang)}>{t('nav.reviews')}</a></li>
+        <li><a href={r('areas', lang)}>{t('nav.areas')}</a></li>
+        <li><a href={r('contact', lang)}>{t('cta.estimateShort')}</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="footer__h">{t('footer.contact')}</h2>
+      <ul class="footer__contact">
+        <li><a href={telHref} data-track="call-footer"><Icon name="phone" size={18} /> {site.phone}</a></li>
+        <li><a href={smsHref} data-track="text-footer"><Icon name="message" size={18} /> {t('cta.textUs')}</a></li>
+        <li><a href={mailHref} class="footer__email"><Icon name="mail" size={18} /> {site.email}</a></li>
+        {site.hours && <li><Icon name="clock" size={18} /> {site.hours[lang]}</li>}
+        <li><Icon name="pin" size={18} /> {lang === 'en' ? 'Serving the Inland Empire, CA' : 'Sirviendo al Inland Empire, CA'}</li>
+      </ul>
+      <a class="btn btn--primary footer__cta" href={r('contact', lang)}>{t('cta.estimate')}</a>
+      {
+        socials.length > 0 && (
+          <ul class="footer__social">
+            {socials.map(([name, url]) => (
+              <li>
+                <a href={url} target="_blank" rel="noopener">
+                  {name[0].toUpperCase() + name.slice(1)}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+  </div>
+
+  <div class="container footer__areas">
+    <h2 class="footer__h">{t('footer.areas')}</h2>
+    <ul>
+      {cities.map((c) => <li><a href={cityPath(c.slug, lang)}>{c.name}</a></li>)}
+    </ul>
+  </div>
+
+  <div class="footer__bottom">
+    <div class="container footer__bottom-inner">
+      <p>© {year} {site.name}. {t('footer.rights')} CA Lic. #{site.license}</p>
+      <p>
+        <a href={r('privacy', lang)}>{t('footer.privacy')}</a> · {t('footer.photos')}
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--green-900);
+    color: #c9d6c5;
+    font-size: 0.95rem;
+  }
+  .footer a:not(.btn) {
+    color: #e3ebe0;
+    text-decoration: none;
+  }
+  .footer__bottom a:not(.btn) {
+    text-decoration: underline;
+  }
+  .footer a:not(.btn):hover {
+    color: var(--white);
+    text-decoration: underline;
+  }
+  .footer__grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 0.8fr 1.3fr;
+    gap: 40px;
+    padding-block: 72px 40px;
+  }
+  .footer__brand p {
+    margin: 18px 0;
+    max-width: 320px;
+  }
+  .footer__h {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #a6db86;
+    margin-bottom: 16px;
+  }
+  .footer ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .footer__links li,
+  .footer__contact li {
+    margin-bottom: 10px;
+  }
+  .footer__badges li,
+  .footer__contact li,
+  .footer__contact a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .footer__badges li {
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .footer__badges :global(svg),
+  .footer__contact :global(svg) {
+    color: #a6db86;
+    flex: none;
+  }
+  .footer__email {
+    word-break: break-all;
+  }
+  .footer__cta {
+    margin-top: 8px;
+  }
+  .footer__social {
+    display: flex;
+    gap: 16px;
+    margin-top: 18px !important;
+  }
+  .footer__areas {
+    padding-block: 28px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .footer__areas ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 22px;
+  }
+  .footer__bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.85rem;
+  }
+  .footer__bottom-inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 24px;
+    padding-block: 20px;
+  }
+  .footer__bottom p {
+    margin: 0;
+  }
+  @media (max-width: 960px) {
+    .footer__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 560px) {
+    .footer__grid {
+      grid-template-columns: 1fr;
+      padding-top: 56px;
+    }
+  }
+</style>

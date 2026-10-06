@@ -1,0 +1,86 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import { site, telHref, smsHref } from '../data/site';
+import { r, type Lang } from '../i18n/routes';
+import { useT } from '../i18n/ui';
+import bg from '../assets/photos/socal-homes.jpg';
+
+interface Props {
+  lang: Lang;
+  title?: string;
+  text?: string;
+}
+const { lang, title, text } = Astro.props;
+const t = useT(lang);
+---
+
+<section class="ctaband">
+  <Image quality={68} src={bg} alt="" class="ctaband__bg" widths={[800, 1600]} sizes="100vw" />
+  <div class="container ctaband__inner">
+    <h2>{title ?? t('cta.band.title')}</h2>
+    <p>{text ?? t('cta.band.text')}</p>
+    <div class="btn-row">
+      <a class="btn btn--primary btn--lg" href={r('contact', lang)}>{t('cta.estimate')} <Icon name="arrow" /></a>
+      <a class="btn btn--ghost-light btn--lg" href={telHref} data-track="call-cta-band"><Icon name="phone" /> {site.phone}</a>
+      <a class="btn btn--ghost-light btn--lg ctaband__text" href={smsHref} data-track="text-cta-band"><Icon name="message" /> {t('cta.textUs')}</a>
+    </div>
+    <p class="ctaband__trust"><Icon name="shield" size={16} /> {t('trust.licensed')} · {t('trust.license')} · {t('trust.years')}</p>
+  </div>
+</section>
+
+<style>
+  .ctaband {
+    position: relative;
+    overflow: hidden;
+    background: var(--green-900);
+    color: var(--white);
+    text-align: center;
+  }
+  .ctaband__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.25;
+  }
+  .ctaband::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(18, 48, 27, 0.55), rgba(18, 48, 27, 0.92));
+  }
+  .ctaband__inner {
+    position: relative;
+    z-index: 1;
+    padding-block: clamp(72px, 10vw, 120px);
+    max-width: 880px;
+  }
+  .ctaband h2 {
+    color: var(--white);
+    font-size: clamp(2rem, 4.4vw, 3.2rem);
+  }
+  .ctaband p {
+    font-size: 1.2rem;
+    color: #dce7d8;
+    margin-bottom: 32px;
+  }
+  .ctaband .btn-row {
+    justify-content: center;
+  }
+  .ctaband__trust {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.9rem !important;
+    margin: 28px 0 0 !important;
+    flex-wrap: wrap;
+  }
+  @media (min-width: 861px) {
+    .ctaband__text {
+      display: none;
+    }
+  }
+</style>

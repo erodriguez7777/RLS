@@ -1,0 +1,58 @@
+---
+import Base from '../layouts/Base.astro';
+import { site, mailHref } from '../data/site';
+import { r, type Lang } from '../i18n/routes';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const other: Lang = lang === 'en' ? 'es' : 'en';
+---
+
+<Base
+  lang={lang}
+  title={lang === 'en' ? 'Privacy Policy | Rodriguez Landscaping' : 'Política de Privacidad | Rodriguez Landscaping'}
+  description={lang === 'en' ? 'How Rodriguez Landscaping handles your information.' : 'Cómo Rodriguez Landscaping maneja su información.'}
+  alternate={r('privacy', other)}
+>
+  <section class="section">
+    <div class="container prose policy">
+      {
+        lang === 'en' ? (
+          <>
+            <h1>Privacy Policy</h1>
+            <p>
+              {site.name} respects your privacy. When you request an estimate, we collect the information you provide — such as your name, phone number, email, city and project details — and use it only to
+              respond to your request and provide our services.
+            </p>
+            <p>We do not sell or rent your personal information. Form submissions are processed by our website host so they can be delivered to us.</p>
+            <p>
+              This site may use basic analytics to understand how visitors use it so we can improve it. You can ask us to update or delete your information at any time by emailing{' '}
+              <a href={mailHref}>{site.email}</a> or calling {site.phone}.
+            </p>
+          </>
+        ) : (
+          <>
+            <h1>Política de Privacidad</h1>
+            <p>
+              {site.name} respeta su privacidad. Cuando pide un estimado, recopilamos la información que nos da — como su nombre, teléfono, correo, ciudad y detalles del proyecto — y la usamos solo para responder a
+              su solicitud y ofrecer nuestros servicios.
+            </p>
+            <p>No vendemos ni rentamos su información personal. Los formularios son procesados por nuestro proveedor de hosting para que nos lleguen.</p>
+            <p>
+              Este sitio puede usar análisis básicos para entender cómo lo usan los visitantes y mejorarlo. Puede pedirnos actualizar o borrar su información en cualquier momento escribiendo a{' '}
+              <a href={mailHref}>{site.email}</a> o llamando al {site.phone}.
+            </p>
+          </>
+        )
+      }
+    </div>
+  </section>
+</Base>
+
+<style>
+  .policy {
+    max-width: 760px;
+  }
+</style>

@@ -1,0 +1,62 @@
+---
+import Icon from './Icon.astro';
+import { telHref, smsHref } from '../data/site';
+import { r, type Lang } from '../i18n/routes';
+import { useT } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+---
+
+<div class="mbar" role="navigation" aria-label={lang === 'en' ? 'Quick contact' : 'Contacto rápido'}>
+  <a href={telHref} class="mbar__btn" data-track="call-mobile-bar"><Icon name="phone" size={20} /><span>{t('cta.call')}</span></a>
+  <a href={smsHref} class="mbar__btn" data-track="text-mobile-bar"><Icon name="message" size={20} /><span>{t('cta.text')}</span></a>
+  <a href={r('contact', lang)} class="mbar__btn mbar__btn--primary"><Icon name="calendar" size={20} /><span>{t('cta.estimateShort')}</span></a>
+</div>
+
+<style>
+  .mbar {
+    display: none;
+  }
+  @media (max-width: 860px) {
+    .mbar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 60;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.6fr;
+      gap: 8px;
+      padding: 8px max(10px, env(safe-area-inset-left, 0px)) calc(8px + env(safe-area-inset-bottom, 0px));
+      background: var(--green-900);
+      box-shadow: 0 -8px 24px -12px rgba(0, 0, 0, 0.4);
+    }
+  }
+  .mbar__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 52px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--white);
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+  }
+  .mbar__btn:hover {
+    color: var(--white);
+  }
+  .mbar__btn--primary {
+    background: var(--amber);
+    color: var(--amber-ink);
+  }
+  .mbar__btn--primary:hover {
+    color: var(--amber-ink);
+  }
+</style>

@@ -1,0 +1,68 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import AreasList from '../components/AreasList.astro';
+import TrustBar from '../components/TrustBar.astro';
+import CTABand from '../components/CTABand.astro';
+import { cities } from '../data/cities';
+import { site } from '../data/site';
+import { r, type Lang } from '../i18n/routes';
+import { useT } from '../i18n/ui';
+import heroImg from '../assets/photos/socal-homes.jpg';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+const other: Lang = lang === 'en' ? 'es' : 'en';
+const counties = [
+  { key: 'San Bernardino', en: 'San Bernardino County', es: 'Condado de San Bernardino' },
+  { key: 'Riverside', en: 'Riverside County', es: 'Condado de Riverside' },
+  { key: 'Los Angeles', en: 'Pomona Valley', es: 'Valle de Pomona' },
+] as const;
+const title =
+  lang === 'en'
+    ? 'Service Areas | Inland Empire Landscaping | Rodriguez Landscaping'
+    : 'Áreas de Servicio | Jardinería en el Inland Empire | Rodriguez Landscaping';
+const description =
+  lang === 'en'
+    ? `Rodriguez Landscaping serves San Bernardino, Redlands, Highland, Fontana, Riverside, Corona and more. Licensed & insured, ${site.years}+ years. Free estimates.`
+    : `Rodriguez Landscaping sirve a San Bernardino, Redlands, Highland, Fontana, Riverside, Corona y más. Con licencia y seguro, más de ${site.years} años. Estimados gratis.`;
+---
+
+<Base lang={lang} title={title} description={description} alternate={r('areas', other)}>
+  <PageHero
+    image={heroImg}
+    eyebrow={t('section.areas.eyebrow')}
+    title={t('section.areas.title')}
+    text={t('section.areas.text')}
+    crumbs={[{ href: r('home', lang), label: t('breadcrumb.home') }, { label: t('nav.areas') }]}
+  >
+    <a class="btn btn--primary btn--lg" href={r('contact', lang)}>{t('cta.estimate')}</a>
+  </PageHero>
+  <TrustBar lang={lang} />
+  <section class="section">
+    <div class="container">
+      {
+        counties.map((c) => (
+          <div class="county">
+            <h2>{c[lang]}</h2>
+            <AreasList lang={lang} only={cities.filter((city) => city.county === c.key).map((city) => city.slug)} />
+          </div>
+        ))
+      }
+    </div>
+  </section>
+  <CTABand lang={lang} />
+</Base>
+
+<style>
+  .county + .county {
+    margin-top: 56px;
+  }
+  .county h2 {
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+  }
+</style>

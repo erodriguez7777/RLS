@@ -1,0 +1,177 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import TrustBar from '../components/TrustBar.astro';
+import WhyUs from '../components/WhyUs.astro';
+import Testimonials from '../components/Testimonials.astro';
+import CTABand from '../components/CTABand.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+import { r, type Lang } from '../i18n/routes';
+import { useT } from '../i18n/ui';
+import heroImg from '../assets/photos/crew-mowing.jpg';
+import storyImg from '../assets/photos/paver-steps.jpg';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+const other: Lang = lang === 'en' ? 'es' : 'en';
+const title = lang === 'en' ? `About Us | ${site.years}+ Years of Inland Empire Landscaping | Rodriguez Landscaping` : `Nosotros | Más de ${site.years} Años de Jardinería | Rodriguez Landscaping`;
+const description =
+  lang === 'en'
+    ? `Meet Rodriguez Landscaping: ${site.years}+ years of licensed, insured landscaping in the Inland Empire. Honest pricing, clear communication and quality work.`
+    : `Conozca a Rodriguez Landscaping: más de ${site.years} años de jardinería con licencia y seguro en el Inland Empire. Precios honestos, buena comunicación y trabajo de calidad.`;
+
+const values =
+  lang === 'en'
+    ? [
+        { icon: 'chat', title: 'Honest communication', text: 'We return calls and texts quickly, explain your options clearly and walk you through the finished work.' },
+        { icon: 'dollar', title: 'Fair, transparent pricing', text: 'Clear written estimates with options at different price points. The price we agree on is the price you pay.' },
+        { icon: 'leaf', title: 'Work that lasts', text: 'Proper prep, quality materials and plants chosen for our climate — so your yard looks great for years.' },
+        { icon: 'home', title: 'Respect for your home', text: 'We show up on time, protect your property and leave every job site clean.' },
+      ]
+    : [
+        { icon: 'chat', title: 'Comunicación honesta', text: 'Respondemos llamadas y textos rápido, explicamos sus opciones con claridad y revisamos el trabajo terminado con usted.' },
+        { icon: 'dollar', title: 'Precios justos y claros', text: 'Estimados por escrito con opciones a diferentes precios. El precio que acordamos es el precio que paga.' },
+        { icon: 'leaf', title: 'Trabajo que dura', text: 'Buena preparación, materiales de calidad y plantas adecuadas para nuestro clima — para que su jardín luzca bien por años.' },
+        { icon: 'home', title: 'Respeto por su hogar', text: 'Llegamos a tiempo, cuidamos su propiedad y dejamos todo limpio.' },
+      ];
+---
+
+<Base lang={lang} title={title} description={description} alternate={r('about', other)}>
+  <PageHero
+    image={heroImg}
+    eyebrow={t('nav.about')}
+    title={lang === 'en' ? 'Local Landscapers Who Treat Your Yard Like Our Own' : 'Jardineros Locales Que Cuidan Su Jardín Como Si Fuera Nuestro'}
+    text={lang === 'en' ? `${site.years}+ years of honest, quality landscaping for Inland Empire families.` : `Más de ${site.years} años de jardinería honesta y de calidad para las familias del Inland Empire.`}
+    crumbs={[{ href: r('home', lang), label: t('breadcrumb.home') }, { label: t('nav.about') }]}
+  />
+  <TrustBar lang={lang} />
+
+  <section class="section">
+    <div class="container story">
+      <div class="prose">
+        <span class="eyebrow">{lang === 'en' ? 'Our Story' : 'Nuestra Historia'}</span>
+        <h2>{lang === 'en' ? 'Built on hard work, honesty and happy customers' : 'Construida con trabajo duro, honestidad y clientes contentos'}</h2>
+        {
+          lang === 'en' ? (
+            <>
+              <p>
+                Rodriguez Landscaping has been transforming outdoor spaces for more than {site.years} years. What started with a commitment to doing quality work at a fair price has grown into a trusted
+                landscaping company serving homeowners and property owners across the Inland Empire.
+              </p>
+              <p>
+                Led by Miguel and his experienced crew, we handle everything from weekly lawn care to sod, irrigation, drought-tolerant conversions and complete hardscape makeovers. Our customers tell us what
+                sets us apart: we listen, we offer real options for every budget, and we keep you informed from the first visit to the final walkthrough.
+              </p>
+              <p>
+                We’re fully licensed, bonded and insured (CA License #{site.license}), so you can hire us with complete confidence. Your satisfaction means everything to us — and our reputation is built one yard at a time.
+              </p>
+            </>
+          ) : (
+            <>
+              <p>
+                Rodriguez Landscaping ha transformado espacios exteriores por más de {site.years} años. Lo que empezó con el compromiso de hacer un trabajo de calidad a un precio justo se ha convertido en una
+                empresa de jardinería de confianza para propietarios en todo el Inland Empire.
+              </p>
+              <p>
+                Bajo la dirección de Miguel y su equipo con experiencia, hacemos de todo: mantenimiento semanal, pasto, riego, conversiones a jardines de bajo consumo y remodelaciones completas de hardscape.
+                Nuestros clientes nos dicen qué nos hace diferentes: escuchamos, ofrecemos opciones reales para todo presupuesto y le mantenemos informado desde la primera visita hasta la revisión final.
+              </p>
+              <p>
+                Contamos con licencia, fianza y seguro (Licencia CA #{site.license}), para que nos contrate con total confianza. Su satisfacción lo es todo para nosotros — y nuestra reputación se construye un jardín a la vez.
+              </p>
+            </>
+          )
+        }
+        <a class="verify" href={site.cslbUrl} target="_blank" rel="noopener"><Icon name="shield" size={18} /> {t('footer.verify')} #{site.license} (CSLB)</a>
+      </div>
+      <Image quality={68} src={storyImg} alt={lang === 'en' ? 'Paver patio with stone steps and plantings' : 'Patio de adoquín con escalones de piedra y plantas'} widths={[500, 900]} sizes="(max-width: 900px) 100vw, 500px" class="story__img" />
+    </div>
+  </section>
+
+  <section class="section section--sand">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">{lang === 'en' ? 'Our Promise' : 'Nuestra Promesa'}</span>
+        <h2>{lang === 'en' ? 'What You Can Expect From Us' : 'Lo Que Puede Esperar de Nosotros'}</h2>
+      </div>
+      <div class="grid grid--4">
+        {
+          values.map((v) => (
+            <div class="card value reveal">
+              <span class="value__icon">
+                <Icon name={v.icon} />
+              </span>
+              <h3>{v.title}</h3>
+              <p>{v.text}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <WhyUs lang={lang} />
+
+  <section class="section section--sand">
+    <div class="container">
+      <div class="section-head">
+        <h2>{t('section.reviews.title')}</h2>
+      </div>
+      <Testimonials lang={lang} limit={3} />
+    </div>
+  </section>
+
+  <CTABand lang={lang} />
+</Base>
+
+<style>
+  .story {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: clamp(32px, 6vw, 80px);
+    align-items: center;
+  }
+  .story__img {
+    border-radius: 20px;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    box-shadow: var(--shadow-lg);
+  }
+  .verify {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    font-weight: 600;
+  }
+  .value {
+    padding: 28px 24px;
+  }
+  .value p {
+    color: var(--ink-soft);
+    margin: 0;
+  }
+  .value__icon {
+    display: grid;
+    place-items: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    background: var(--green-100);
+    color: var(--green-700);
+    margin-bottom: 16px;
+  }
+  @media (max-width: 900px) {
+    .story {
+      grid-template-columns: 1fr;
+    }
+    .story__img {
+      aspect-ratio: 16 / 10;
+    }
+  }
+</style>

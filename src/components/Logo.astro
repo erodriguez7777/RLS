@@ -1,0 +1,66 @@
+---
+interface Props {
+  light?: boolean;
+}
+const { light = false } = Astro.props;
+---
+
+<span class:list={['logo', { 'logo--light': light }]}>
+  <svg class="logo__mark" viewBox="0 0 48 48" aria-hidden="true">
+    <circle cx="24" cy="24" r="23" fill="var(--logo-bg)"></circle>
+    <path
+      d="M15 33c0-10 6.5-17.5 19-19-1 11.5-7.5 19-17 19.5"
+      fill="none"
+      stroke="#a6db86"
+      stroke-width="2.6"
+      stroke-linecap="round"
+      stroke-linejoin="round"></path>
+    <path d="M15 33c3.5-6 8-10 13-13" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"></path>
+    <path d="M11 36.5h26" stroke="#f2a900" stroke-width="2.4" stroke-linecap="round"></path>
+  </svg>
+  <span class="logo__text">
+    <span class="logo__name">Rodriguez</span>
+    <span class="logo__sub">Landscaping</span>
+  </span>
+</span>
+
+<style>
+  .logo {
+    --logo-bg: var(--green-700);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--green-900);
+    line-height: 1;
+  }
+  .logo--light {
+    --logo-bg: var(--green-600);
+    color: var(--white);
+  }
+  .logo__mark {
+    width: 44px;
+    height: 44px;
+    flex: none;
+  }
+  .logo__text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .logo__name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.45rem;
+    letter-spacing: -0.01em;
+  }
+  .logo__sub {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--green-600);
+  }
+  .logo--light .logo__sub {
+    color: #a6db86;
+  }
+</style>

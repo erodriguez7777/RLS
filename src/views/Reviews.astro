@@ -1,0 +1,57 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Testimonials from '../components/Testimonials.astro';
+import TrustBar from '../components/TrustBar.astro';
+import CTABand from '../components/CTABand.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+import { r, type Lang } from '../i18n/routes';
+import { useT } from '../i18n/ui';
+import heroImg from '../assets/photos/flower-beds.jpg';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+const other: Lang = lang === 'en' ? 'es' : 'en';
+const title = lang === 'en' ? 'Customer Reviews | Rodriguez Landscaping' : 'Reseñas de Clientes | Rodriguez Landscaping';
+const description =
+  lang === 'en'
+    ? 'Read what Inland Empire homeowners say about Rodriguez Landscaping — reasonable pricing, great communication and beautiful results.'
+    : 'Lea lo que dicen los propietarios del Inland Empire sobre Rodriguez Landscaping — precios razonables, buena comunicación y resultados hermosos.';
+---
+
+<Base lang={lang} title={title} description={description} alternate={r('reviews', other)}>
+  <PageHero
+    image={heroImg}
+    eyebrow={t('section.reviews.eyebrow')}
+    title={t('section.reviews.title')}
+    text={t('section.reviews.text')}
+    crumbs={[{ href: r('home', lang), label: t('breadcrumb.home') }, { label: t('nav.reviews') }]}
+  />
+  <TrustBar lang={lang} />
+  <section class="section">
+    <div class="container">
+      <Testimonials lang={lang} full />
+      {
+        site.googleReviewUrl && (
+          <p class="leave">
+            <a class="btn btn--green btn--lg" href={site.googleReviewUrl} target="_blank" rel="noopener">
+              <Icon name="star" /> {t('reviews.leave')}
+            </a>
+          </p>
+        )
+      }
+    </div>
+  </section>
+  <CTABand lang={lang} />
+</Base>
+
+<style>
+  .leave {
+    text-align: center;
+    margin: 48px 0 0;
+  }
+</style>

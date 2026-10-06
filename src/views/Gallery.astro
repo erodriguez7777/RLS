@@ -1,0 +1,37 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import GalleryGrid from '../components/GalleryGrid.astro';
+import CTABand from '../components/CTABand.astro';
+import { r, type Lang } from '../i18n/routes';
+import { useT } from '../i18n/ui';
+import heroImg from '../assets/photos/pergola-walkway.jpg';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+const other: Lang = lang === 'en' ? 'es' : 'en';
+const title = lang === 'en' ? 'Our Work | Landscaping Project Gallery | Rodriguez Landscaping' : 'Nuestro Trabajo | Galería de Proyectos | Rodriguez Landscaping';
+const description =
+  lang === 'en'
+    ? 'Browse lawns, hardscapes, drought-tolerant gardens and complete yard makeovers from Rodriguez Landscaping in the Inland Empire.'
+    : 'Vea céspedes, hardscape, jardines de bajo consumo y remodelaciones completas de Rodriguez Landscaping en el Inland Empire.';
+---
+
+<Base lang={lang} title={title} description={description} alternate={r('gallery', other)}>
+  <PageHero
+    image={heroImg}
+    eyebrow={t('section.gallery.eyebrow')}
+    title={t('section.gallery.title')}
+    text={t('section.gallery.text')}
+    crumbs={[{ href: r('home', lang), label: t('breadcrumb.home') }, { label: t('nav.gallery') }]}
+  />
+  <section class="section">
+    <div class="container">
+      <GalleryGrid lang={lang} filters />
+    </div>
+  </section>
+  <CTABand lang={lang} />
+</Base>

@@ -1,0 +1,211 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import TrustBar from '../components/TrustBar.astro';
+import EstimateForm from '../components/EstimateForm.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import Testimonials from '../components/Testimonials.astro';
+import AreasList from '../components/AreasList.astro';
+import FAQ from '../components/FAQ.astro';
+import CTABand from '../components/CTABand.astro';
+import { getService } from '../data/services';
+import { reviews } from '../data/reviews';
+import { faqs } from '../data/faqs';
+import { site, telHref } from '../data/site';
+import type { City } from '../data/cities';
+import { r, cityPath, type Lang } from '../i18n/routes';
+import { useT } from '../i18n/ui';
+import heroImg from '../assets/photos/hero-front-yard.jpg';
+
+interface Props {
+  lang: Lang;
+  city: City;
+}
+const { lang, city } = Astro.props;
+const t = useT(lang);
+const other: Lang = lang === 'en' ? 'es' : 'en';
+const popular = city.popular.map(getService);
+const localReviews = reviews.filter((rv) => rv.city.startsWith(city.name));
+const shown = [...localReviews, ...reviews.filter((rv) => rv.inlandEmpire && !localReviews.includes(rv)), ...reviews].filter(
+  (rv, i, arr) => arr.indexOf(rv) === i,
+).slice(0, 3);
+const countyLabel =
+  city.county === 'Los Angeles'
+    ? lang === 'en' ? 'the Pomona Valley' : 'el Valle de Pomona'
+    : lang === 'en' ? `${city.county} County` : `el Condado de ${city.county}`;
+const formCity = city.slug === 'highland' ? 'Highland' : city.name;
+
+const title =
+  lang === 'en'
+    ? `Landscaping in ${city.name}, CA | Licensed & Insured | Rodriguez Landscaping`
+    : `Jardinería en ${city.name}, CA | Con Licencia y Seguro | Rodriguez Landscaping`;
+const description =
+  lang === 'en'
+    ? `Trusted ${city.name} landscaper for ${site.years}+ years: lawn care, sod, sprinklers, drought-tolerant yards & hardscape. CA Lic. #${site.license}. Free estimates — ${site.phone}.`
+    : `Jardinero de confianza en ${city.name} por más de ${site.years} años: mantenimiento, pasto, riego, jardines de bajo consumo y hardscape. Lic. CA #${site.license}. Estimados gratis — ${site.phone}.`;
+
+const why =
+  lang === 'en'
+    ? [
+        `Local crew that knows ${countyLabel} soil, heat and water rules`,
+        `Licensed, bonded & insured — CA License #${site.license}`,
+        'Free on-site estimates with clear, honest pricing',
+        'Options for every budget — no pressure, no surprises',
+        'Fast replies by phone or text, in English or Spanish',
+      ]
+    : [
+        `Equipo local que conoce la tierra, el calor y las reglas de agua de ${countyLabel}`.replace('de el ', 'del '),
+        `Con licencia, fianza y seguro — Licencia CA #${site.license}`,
+        'Estimados gratis en su propiedad con precios claros y honestos',
+        'Opciones para todo presupuesto — sin presión y sin sorpresas',
+        'Respuesta rápida por teléfono o texto, en español o inglés',
+      ];
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: lang === 'en' ? `Landscaping in ${city.name}, CA` : `Jardinería en ${city.name}, CA`,
+    serviceType: 'Landscaping',
+    provider: { '@id': `${site.url}/#business` },
+    areaServed: { '@type': 'City', name: `${city.name}, CA` },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: t('breadcrumb.home'), item: new URL(r('home', lang), site.url).href },
+      { '@type': 'ListItem', position: 2, name: t('nav.areas'), item: new URL(r('areas', lang), site.url).href },
+      { '@type': 'ListItem', position: 3, name: city.name },
+    ],
+  },
+];
+---
+
+<Base lang={lang} title={title} description={description} alternate={cityPath(city.slug, other)} schema={schema}>
+  <PageHero
+    image={heroImg}
+    eyebrow={`${t('trust.licensed')} · ${t('trust.license')}`}
+    title={`${t('city.title')} ${city.name}, CA`}
+    text={city.note[lang]}
+    crumbs={[
+      { href: r('home', lang), label: t('breadcrumb.home') },
+      { href: r('areas', lang), label: t('nav.areas') },
+      { label: city.name },
+    ]}
+  >
+    <div class="btn-row">
+      <a class="btn btn--primary btn--lg" href="#estimate">{t('cta.estimate')}</a>
+      <a class="btn btn--ghost-light btn--lg" href={telHref} data-track="call-city-hero"><Icon name="phone" /> {site.phone}</a>
+    </div>
+  </PageHero>
+  <TrustBar lang={lang} />
+
+  <section class="section">
+    <div class="container city">
+      <div>
+        <span class="eyebrow">{city.name}, CA</span>
+        <h2>{t('city.why').replace('{city}', city.name)}</h2>
+        <p class="lead">
+          {
+            lang === 'en'
+              ? `For more than ${site.years} years, Rodriguez Landscaping has helped homeowners and property owners across ${countyLabel} create yards they’re proud of. In ${city.name}, we offer everything from weekly maintenance to complete front and backyard makeovers — all handled by one experienced, licensed team.`
+              : `Por más de ${site.years} años, Rodriguez Landscaping ha ayudado a propietarios en ${countyLabel} a tener jardines de los que se sienten orgullosos. En ${city.name} ofrecemos de todo, desde mantenimiento semanal hasta remodelaciones completas de jardín delantero y trasero — con un solo equipo experimentado y con licencia.`
+          }
+        </p>
+        <ul class="checks">{why.map((w) => <li>{w}</li>)}</ul>
+        <div class="city__water">
+          <h3>{lang === 'en' ? `Save water in ${city.name}` : `Ahorre agua en ${city.name}`}</h3>
+          <p>
+            {
+              lang === 'en'
+                ? 'Thinking about replacing your lawn? Drought-tolerant landscaping and efficient drip irrigation can cut outdoor water use while keeping your yard beautiful. Many local water agencies offer turf-replacement rebates — ask us about planning a project that qualifies.'
+                : '¿Está pensando en reemplazar su pasto? Un jardín de bajo consumo y riego por goteo eficiente pueden reducir el uso de agua y mantener su jardín bonito. Muchas agencias de agua locales ofrecen reembolsos por reemplazar el pasto — pregúntenos cómo planear un proyecto que califique.'
+            }
+          </p>
+        </div>
+      </div>
+      <aside>
+        <EstimateForm lang={lang} defaultCity={formCity} compact title={lang === 'en' ? `Free Estimate in ${city.name}` : `Estimado Gratis en ${city.name}`} />
+      </aside>
+    </div>
+  </section>
+
+  <section class="section section--sand">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">{t('section.services.eyebrow')}</span>
+        <h2>{t('city.services')} {city.name}</h2>
+      </div>
+      <div class="grid grid--4">
+        {popular.map((s) => <ServiceCard service={s} lang={lang} />)}
+      </div>
+      <p class="center"><a class="btn btn--ghost" href={r('services', lang)}>{t('cta.viewServices')} <Icon name="arrow" size={18} /></a></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">{t('section.reviews.eyebrow')}</span>
+        <h2>{t('section.reviews.title')}</h2>
+      </div>
+      <Testimonials lang={lang} items={shown} />
+    </div>
+  </section>
+
+  <section class="section section--sand section--tight">
+    <div class="container">
+      <div class="section-head">
+        <h2>{t('city.nearby')}</h2>
+      </div>
+      <AreasList lang={lang} only={city.nearby} />
+      <p class="center"><a href={r('areas', lang)}>{t('cta.allAreas')} →</a></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">{t('section.faq.eyebrow')}</span>
+        <h2>{t('section.faq.title')}</h2>
+      </div>
+      <FAQ lang={lang} items={faqs.slice(0, 5)} />
+    </div>
+  </section>
+
+  <CTABand lang={lang} title={lang === 'en' ? `Ready for a better yard in ${city.name}?` : `¿Listo para un mejor jardín en ${city.name}?`} />
+</Base>
+
+<style>
+  .city {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 440px;
+    gap: clamp(32px, 5vw, 64px);
+    align-items: start;
+  }
+  .lead {
+    font-size: 1.12rem;
+    color: var(--ink-soft);
+  }
+  .city__water {
+    background: var(--green-100);
+    border-radius: var(--radius);
+    padding: 24px 26px;
+    margin-top: 12px;
+  }
+  .city__water p {
+    margin: 0;
+    color: var(--ink-soft);
+  }
+  .center {
+    text-align: center;
+    margin: 32px 0 0;
+  }
+  @media (max-width: 1000px) {
+    .city {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

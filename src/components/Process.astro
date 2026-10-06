@@ -1,0 +1,87 @@
+---
+import type { Lang } from '../i18n/routes';
+import { useT } from '../i18n/ui';
+import { r } from '../i18n/routes';
+import { site, telHref } from '../data/site';
+import Icon from './Icon.astro';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+const steps = [1, 2, 3].map((n) => ({
+  n,
+  title: t(`process.${n}.title` as 'process.1.title'),
+  text: t(`process.${n}.text` as 'process.1.text'),
+}));
+---
+
+<section class="section section--green process">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">{t('section.process.eyebrow')}</span>
+      <h2>{t('section.process.title')}</h2>
+    </div>
+    <ol class="steps">
+      {
+        steps.map((s) => (
+          <li class="step reveal">
+            <span class="step__n">{s.n}</span>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+    <div class="btn-row process__cta">
+      <a class="btn btn--primary btn--lg" href={r('contact', lang)}>{t('cta.estimate')}</a>
+      <a class="btn btn--ghost-light btn--lg" href={telHref}><Icon name="phone" /> {site.phone}</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    counter-reset: step;
+  }
+  .step {
+    position: relative;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius);
+    padding: 30px 26px;
+  }
+  .step p {
+    color: #cfdccb;
+    margin: 0;
+  }
+  .step__n {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--amber);
+    color: var(--amber-ink);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.35rem;
+    margin-bottom: 18px;
+  }
+  .process__cta {
+    justify-content: center;
+    margin-top: 44px;
+  }
+  @media (max-width: 860px) {
+    .steps {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
